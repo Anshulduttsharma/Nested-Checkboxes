@@ -1,6 +1,8 @@
+import { useState } from "react";
 import "./App.css";
 
 function App() {
+  const [checked, setChecked] = useState({1: true});
   const checkBoxesData = [
     {
       id: 1,
@@ -15,17 +17,15 @@ function App() {
               name: "Dev Team Lead",
               children: [
                 { id: 9, name: "Frontend Dev", children: [] },
-                { id: 10, name: "Backend Dev", children: [] }
-              ]
+                { id: 10, name: "Backend Dev", children: [] },
+              ],
             },
             {
               id: 6,
               name: "QA Lead",
-              children: [
-                { id: 11, name: "QA Tester", children: [] }
-              ]
-            }
-          ]
+              children: [{ id: 11, name: "QA Tester", children: [] }],
+            },
+          ],
         },
         {
           id: 3,
@@ -34,9 +34,9 @@ function App() {
             {
               id: 7,
               name: "Accountant",
-              children: []
-            }
-          ]
+              children: [],
+            },
+          ],
         },
         {
           id: 4,
@@ -47,12 +47,12 @@ function App() {
               name: "Operations Manager",
               children: [
                 { id: 12, name: "Logistics", children: [] },
-                { id: 13, name: "Customer Support", children: [] }
-              ]
-            }
-          ]
-        }
-      ]
+                { id: 13, name: "Customer Support", children: [] },
+              ],
+            },
+          ],
+        },
+      ],
     },
     {
       id: 14,
@@ -61,7 +61,7 @@ function App() {
         {
           id: 15,
           name: "Advisor",
-          children: []
+          children: [],
         },
         {
           id: 16,
@@ -70,28 +70,45 @@ function App() {
             {
               id: 17,
               name: "Market Analyst",
-              children: []
-            }
-          ]
-        }
-      ]
+              children: [],
+            },
+          ],
+        },
+      ],
     },
     {
       id: 18,
       name: "Board Member",
-      children: []
-    }
+      children: [],
+    },
   ];
-  
 
-  const CheckBoxes = ({ data }) => {
+  const CheckBoxes = ({ data, checked, setChecked }) => {
+    const handleChange = (e, id) => {
+      setChecked((prev) => {
+        const newState = { ...prev, [id]: e.target.checked };
+        return newState;
+      });
+    };
+    console.log(checked);
+    
     return (
       <div>
         {data.map((node) => (
           <div key={node.id} className="parent">
-            <input type="checkbox"/>
+            <input
+              type="checkbox"
+              checked={checked[node.id] || false}
+              onChange={(e) => handleChange(e, node.id)}
+            />
             <span>{node.name}</span>
-            {node.children && <CheckBoxes data={node.children} />}
+            {node.children && (
+              <CheckBoxes
+                data={node.children}
+                checked={checked}
+                setChecked={setChecked}
+              />
+            )}
           </div>
         ))}
       </div>
@@ -99,7 +116,11 @@ function App() {
   };
   return (
     <>
-      <CheckBoxes data={checkBoxesData} />
+      <CheckBoxes
+        data={checkBoxesData}
+        checked={checked}
+        setChecked={setChecked}
+      />
     </>
   );
 }
