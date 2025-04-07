@@ -86,15 +86,38 @@ function App() {
   const CheckBoxes = ({ data, checked, setChecked }) => {
     const handleChange = (isChecked, node) => {
       setChecked((prev) => {
-        const newState = { ...prev, [node.id]: isChecked };
-        //if children are present , add all of them into newState
-        const updateChildren = (node) => {
-          node.children?.forEach((child) => {
+        const newState = { ...prev };
+
+        // 1. Toggle the current node
+        newState[node.id] = isChecked;
+
+        // 2. Update children recursively
+        const updateChildren = (currentNode) => {
+          currentNode.children?.forEach((child) => {
             newState[child.id] = isChecked;
-            child.children && updateChildren(child);
+            if (child.children?.length) {
+              updateChildren(child);
+            }
           });
         };
-        updateChildren(node)
+        updateChildren(node);
+
+        // 3. Recursively update parents
+        const verifyChecked = (currentNode) => {
+          if (!currentNode.children || currentNode.children.length === 0) {
+            return newState[currentNode.id] || false;
+          }
+
+          const allChildrenChecked = currentNode.children.every((child) =>
+            verifyChecked(child)
+          );
+
+          newState[currentNode.id] = allChildrenChecked;
+          return allChildrenChecked;
+        };
+
+        checkBoxesData.forEach((topNode) => verifyChecked(topNode));
+
         return newState;
       });
     };
