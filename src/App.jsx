@@ -2,7 +2,7 @@ import { useState } from "react";
 import "./App.css";
 
 function App() {
-  const [checked, setChecked] = useState({1: true});
+  const [checked, setChecked] = useState({});
   const checkBoxesData = [
     {
       id: 1,
@@ -84,14 +84,22 @@ function App() {
   ];
 
   const CheckBoxes = ({ data, checked, setChecked }) => {
-    const handleChange = (e, id) => {
+    const handleChange = (isChecked, node) => {
       setChecked((prev) => {
-        const newState = { ...prev, [id]: e.target.checked };
+        const newState = { ...prev, [node.id]: isChecked };
+        //if children are present , add all of them into newState
+        const updateChildren = (node) => {
+          node.children?.forEach((child) => {
+            newState[child.id] = isChecked;
+            child.children && updateChildren(child);
+          });
+        };
+        updateChildren(node)
         return newState;
       });
     };
     console.log(checked);
-    
+
     return (
       <div>
         {data.map((node) => (
@@ -99,7 +107,7 @@ function App() {
             <input
               type="checkbox"
               checked={checked[node.id] || false}
-              onChange={(e) => handleChange(e, node.id)}
+              onChange={(e) => handleChange(e.target.checked, node)}
             />
             <span>{node.name}</span>
             {node.children && (
